@@ -26,7 +26,13 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push $DOCKER_IMAGE:$BUILD_NUMBER
@@ -45,22 +51,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully.'
+            echo '✅ Pipeline completed successfully.'
         }
         failure {
-            echo 'Pipeline failed.'
+            echo '❌ Pipeline failed.'
         }
-    }
-
-    post {
-    success {
-        mail to: 'janardhanrao309@gmail.com',
-             subject: "✅ Jenkins Build Success: ${env.JOB_NAME}",
-             body: "Build #${env.BUILD_NUMBER} was successful."
-    }
-    failure {
-        mail to: 'janardhanrao309@gmail.com',
-             subject: "❌ Jenkins Build Failed: ${env.JOB_NAME}",
-             body: "Build #${env.BUILD_NUMBER} failed."
     }
 }
